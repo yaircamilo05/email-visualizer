@@ -3,18 +3,18 @@
     <div class="flex justify-between mb-4">
       <input
         v-model="searchQuery"
-        @input="loadData"
         type="text"
         placeholder="Search..."
         class="p-2 border border-gray-300 rounded"
       />
-      <select v-model="resultsPerPage" @change="loadData" class="p-2 border border-gray-300 rounded">
-        <option value="5">5</option>
-        <option value="10">10</option>
-        <option value="20">20</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
+      <select v-model="resultsPerPage" class="p-2 border border-gray-300 rounded">
+        <option :value="5">5</option>
+        <option :value="10">10</option>
+        <option :value="20">20</option>
+        <option :value="50">50</option>
+        <option :value="100">100</option>
       </select>
+      <button @click="applyChanges" class="p-2 bg-blue-500 text-white rounded">Actualizar</button>
     </div>
     <table class="min-w-full bg-white">
       <thead>
@@ -40,10 +40,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { fetchData } from '@/api/apiService';
 import type { ApiResponse, Hit } from '@/models/response.model';
 import EmailDetails from '@/components/EmailDetails.vue';
+import Swal from 'sweetalert2';
 
 const data = ref<ApiResponse | null>(null);
 const searchQuery = ref('');
@@ -55,7 +56,16 @@ const loadData = async () => {
     data.value = await fetchData(resultsPerPage.value, searchQuery.value);
   } catch (error) {
     console.error('Error fetching data:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Error fetching data!',
+    });
   }
+};
+
+const applyChanges = () => {
+  loadData();
 };
 
 const selectEmail = (email: Hit) => {
@@ -65,8 +75,6 @@ const selectEmail = (email: Hit) => {
 onMounted(() => {
   loadData();
 });
-
-watch([searchQuery, resultsPerPage], loadData);
 </script>
 
 <style scoped>
