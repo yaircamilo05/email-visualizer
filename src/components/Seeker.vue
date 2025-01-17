@@ -10,7 +10,7 @@
     />
     <select
       :value="resultsPerPage"
-      @change="$emit('update:resultsPerPage', Number(($event.target as HTMLInputElement).value))"
+      @change="$emit('update:resultsPerPage', Number(($event.target as HTMLSelectElement).value))"
       class="p-2 border border-gray-300 rounded"
     >
       <option :value="5">5</option>

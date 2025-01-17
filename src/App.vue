@@ -3,6 +3,8 @@
     <Seeker
       :searchQuery="searchQuery"
       :resultsPerPage="resultsPerPage"
+      @update:searchQuery="searchQuery = $event"
+      @update:resultsPerPage="resultsPerPage = $event"
       @applyChanges="applyChanges"
     />
     <table class="min-w-full bg-white">
@@ -42,7 +44,7 @@ import type { ApiResponse, Hit } from '@/models/response.model';
 import Modal from '@/components/Modal.vue';
 import EmailDetails from '@/components/EmailDetails.vue';
 import Pagination from '@/components/Pagination.vue';
-import Seeker from './components/Seeker.vue';
+import Seeker from '@/components/Seeker.vue';
 
 const data = ref<ApiResponse | null>(null);
 const searchQuery = ref('');
