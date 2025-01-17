@@ -1,7 +1,7 @@
 import type { ApiResponse } from '@/models/response.model';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5080/api/default/_search';
+const API_URL = 'http://localhost:5080/api/prueba/_search';
 
 const auth = {
   username: 'root@example.com',
@@ -9,15 +9,15 @@ const auth = {
 };
 
 //problemas con el nombre del schema definitivo
-export const fetchData = async (cant:number,parameter?:string): Promise<ApiResponse> => {
+export const fetchData = async (size:number,parameter?:string,from:number=0): Promise<ApiResponse> => {
   const body = {
     query: {
         sql: "SELECT * FROM 'emails'",
         start_time: 1737128270337294,
         end_time: 1737128351027176,
         //el from es el numero del registro de inicio y el size cuantos me va a traer desde ese inicio
-        from: 0,
-        size: cant
+        from: from,
+        size: size
     },
     search_type: 'ui',
     timeout: 0

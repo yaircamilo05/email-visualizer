@@ -1,21 +1,10 @@
 <template>
   <div class="p-4">
-    <div class="flex justify-between mb-4">
-      <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="Search..."
-        class="p-2 border border-gray-300 rounded"
-      />
-      <select v-model="resultsPerPage" class="p-2 border border-gray-300 rounded">
-        <option :value="5">5</option>
-        <option :value="10">10</option>
-        <option :value="20">20</option>
-        <option :value="50">50</option>
-        <option :value="100">100</option>
-      </select>
-      <button @click="applyChanges" class="p-2 bg-blue-500 text-white rounded">Actualizar</button>
-    </div>
+    <Seeker
+      :searchQuery="searchQuery"
+      :resultsPerPage="resultsPerPage"
+      @applyChanges="applyChanges"
+    />
     <table class="min-w-full bg-white">
       <thead>
         <tr>
@@ -32,8 +21,15 @@
         </tr>
       </tbody>
     </table>
+    <Pagination
+      :currentPage="currentPage"
+      :totalPages="totalPages"
+      @updatePage="updatePage"
+    />
 
-    <EmailDetails v-if="selectedEmail" :email="selectedEmail" />
+    <Modal v-if="selectedEmail" title="Email Details" @close="selectedEmail = null">
+      <EmailDetails :email="selectedEmail" />
+    </Modal>
   </div>
 
   <RouterView />
@@ -43,28 +39,39 @@
 import { ref, onMounted } from 'vue';
 import { fetchData } from '@/api/apiService';
 import type { ApiResponse, Hit } from '@/models/response.model';
+import Modal from '@/components/Modal.vue';
 import EmailDetails from '@/components/EmailDetails.vue';
-import Swal from 'sweetalert2';
+import Pagination from '@/components/Pagination.vue';
+import Seeker from './components/Seeker.vue';
 
 const data = ref<ApiResponse | null>(null);
 const searchQuery = ref('');
 const resultsPerPage = ref(10);
+const currentPage = ref(1);
+const totalPages = ref(1);
 const selectedEmail = ref<Hit | null>(null);
 
 const loadData = async () => {
   try {
-    data.value = await fetchData(resultsPerPage.value, searchQuery.value);
+    const response = await fetchData(resultsPerPage.value, searchQuery.value, (currentPage.value - 1) * resultsPerPage.value);
+    data.value = response;
+    totalPages.value = Math.ceil(response.scan_records / resultsPerPage.value);
+    if (data.value.hits.length === 0) {
+      alert('No emails found!');
+    }
   } catch (error) {
     console.error('Error fetching data:', error);
-    Swal.fire({
-      icon: 'error',
-      title: 'Oops...',
-      text: 'Error fetching data!',
-    });
+    alert('Error fetching data!');
   }
 };
 
 const applyChanges = () => {
+  currentPage.value = 1;
+  loadData();
+};
+
+const updatePage = (page: number) => {
+  currentPage.value = page;
   loadData();
 };
 
