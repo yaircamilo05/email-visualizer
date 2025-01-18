@@ -1,22 +1,26 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
+
+const routes = [
+  {
+    path: '/',
+    name: 'Home',
+    component: () => import('@/App.vue'),
+  },
+  {
+    path: '/index-form',
+    name: 'index-form',
+    component: () => import('../components/IndexForm.vue'),
+  },
+  {
+    path: '/inbox',
+    name: 'inbox',
+    component: () => import('../views/Inbox.vue'),
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
-    },
-    {
-      path: '/index-form',
-      name: 'index-form',
-      component: () => import('../components/IndexForm.vue'),
-    }
-  ],
-})
+  routes,
+});
 
-export default router
+export default router;
