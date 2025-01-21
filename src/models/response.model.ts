@@ -1,26 +1,6 @@
 export interface ApiResponse {
-  took: number;
-  took_detail: TookDetail;
   hits: Hit[];
-  total: number;
-  from: number;
-  size: number;
-  cached_ratio: number;
-  scan_size: number;
-  idx_scan_size: number;
   scan_records: number;
-  trace_id: string;
-  is_partial: boolean;
-  result_cache_ratio: number;
-  order_by: string;
-}
-
-export interface TookDetail {
-  total: number;
-  idx_took: number;
-  wait_queue: number;
-  cluster_total: number;
-  cluster_wait_queue: number;
 }
 
 export interface Hit {

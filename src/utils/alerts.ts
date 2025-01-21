@@ -5,7 +5,7 @@ export const showWarningAlert = (title: string, text: string) => {
     icon: 'warning',
     title: title,
     text: text,
-    background: '#00ffff',
+    background: '#ffffff',
     iconColor: '#856404'
   });
 };
