@@ -43,24 +43,21 @@ import Modal from '@/components/Modal.vue';
 import EmailDetails from '@/components/EmailDetails.vue';
 import Pagination from '@/components/Pagination.vue';
 import Seeker from '@/components/Seeker.vue';
-import { showErrorAlert, showWarningAlert } from '@/utils/alerts';
-
-
+import { showWarningAlert, showErrorAlert } from '@/utils/alerts';
 
 const data = ref<ApiResponse | null>(null);
 const searchQuery = ref('');
 const resultsPerPage = ref(10);
 const currentPage = ref(1);
-const totalPages = ref(1);
+const totalPages = ref<number | string>(1);
 const selectedEmail = ref<Hit | null>(null);
 
 const loadData = async () => {
   try {
     const response = await fetchData(resultsPerPage.value, searchQuery.value, (currentPage.value - 1) * resultsPerPage.value);
     data.value = response;
-    totalPages.value = Math.ceil(response.scan_records / resultsPerPage.value);
     if (data.value.hits.length === 0) {
-        showWarningAlert('No Results', 'No emails found!');
+      showWarningAlert('No Results', 'No emails found!');
     }
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -70,7 +67,13 @@ const loadData = async () => {
 
 const applyChanges = () => {
   currentPage.value = 1;
-  loadData();
+  loadData().then(() => {
+    if (searchQuery.value) {
+      totalPages.value = 'muchas'; // Set to 'muchas' when a search parameter is provided
+    } else {
+      totalPages.value = Math.ceil((data.value?.scan_records ?? 0) / resultsPerPage.value || 1);
+    }
+  });
 };
 
 const updatePage = (page: number) => {

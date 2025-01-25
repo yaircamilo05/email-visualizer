@@ -10,7 +10,7 @@
     <span class="px-4 py-2 mx-1">{{ currentPage }} / {{ totalPages }}</span>
     <button
       @click="nextPage"
-      :disabled="currentPage === totalPages"
+      :disabled="currentPage === totalPages || (typeof totalPages === 'number' && currentPage >= totalPages)"
       class="px-4 py-2 mx-1 bg-gray-300 rounded disabled:opacity-50"
     >
       Next
@@ -23,7 +23,7 @@ import { defineProps, defineEmits } from 'vue';
 
 const props = defineProps<{
   currentPage: number;
-  totalPages: number;
+  totalPages: number | string;
 }>();
 
 const emit = defineEmits<{
@@ -37,7 +37,11 @@ const prevPage = () => {
 };
 
 const nextPage = () => {
-  if (props.currentPage < props.totalPages) {
+  if (typeof props.totalPages === 'number') {
+    if (props.currentPage < props.totalPages) {
+      emit('updatePage', props.currentPage + 1);
+    }
+  } else {
     emit('updatePage', props.currentPage + 1);
   }
 };
