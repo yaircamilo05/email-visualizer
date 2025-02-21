@@ -36,7 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { fetchData } from '@/api/apiService';
 import type { ApiResponse, Hit } from '@/models/response.model';
 import Modal from '@/components/Modal.vue';
@@ -52,12 +53,20 @@ const currentPage = ref(1);
 const totalPages = ref<number | string>(1);
 const selectedEmail = ref<Hit | null>(null);
 
+const router = useRouter();
+const route = useRoute();
+
 const loadData = async () => {
   try {
     const response = await fetchData(resultsPerPage.value, searchQuery.value, (currentPage.value - 1) * resultsPerPage.value);
     data.value = response;
     if (data.value.hits.length === 0) {
       showWarningAlert('No Results', 'No emails found!');
+    }
+    if (searchQuery.value) {
+      totalPages.value = 'muchas'; // Set to 'muchas' when a search parameter is provided
+    } else {
+      totalPages.value = Math.ceil((data.value?.scan_records ?? 0) / resultsPerPage.value || 1);
     }
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -67,17 +76,12 @@ const loadData = async () => {
 
 const applyChanges = () => {
   currentPage.value = 1;
-  loadData().then(() => {
-    if (searchQuery.value) {
-      totalPages.value = 'muchas'; // Set to 'muchas' when a search parameter is provided
-    } else {
-      totalPages.value = Math.ceil((data.value?.scan_records ?? 0) / resultsPerPage.value || 1);
-    }
-  });
+  loadData();
 };
 
 const updatePage = (page: number) => {
   currentPage.value = page;
+  router.push({ query: { ...route.query, page: currentPage.value } });
   loadData();
 };
 
@@ -86,7 +90,17 @@ const selectEmail = (email: Hit) => {
 };
 
 onMounted(() => {
+  if (route.query.page) {
+    currentPage.value = Number(route.query.page);
+  }
   loadData();
+});
+
+watch(route, (newRoute) => {
+  if (newRoute.query.page) {
+    currentPage.value = Number(newRoute.query.page);
+    loadData();
+  }
 });
 </script>
 
