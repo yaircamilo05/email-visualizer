@@ -76,12 +76,13 @@ const loadData = async () => {
 
 const applyChanges = () => {
   currentPage.value = 1;
+  router.push({ query: { ...route.query, page: currentPage.value, search: searchQuery.value } });
   loadData();
 };
 
 const updatePage = (page: number) => {
   currentPage.value = page;
-  router.push({ query: { ...route.query, page: currentPage.value } });
+  router.push({ query: { ...route.query, page: currentPage.value, search: searchQuery.value } });
   loadData();
 };
 
@@ -93,14 +94,20 @@ onMounted(() => {
   if (route.query.page) {
     currentPage.value = Number(route.query.page);
   }
+  if (route.query.search) {
+    searchQuery.value = String(route.query.search);
+  }
   loadData();
 });
 
 watch(route, (newRoute) => {
   if (newRoute.query.page) {
     currentPage.value = Number(newRoute.query.page);
-    loadData();
   }
+  if (newRoute.query.search) {
+    searchQuery.value = String(newRoute.query.search);
+  }
+  loadData();
 });
 </script>
 
